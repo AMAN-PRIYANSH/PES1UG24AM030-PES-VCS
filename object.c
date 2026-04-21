@@ -93,6 +93,8 @@ int object_exists(const ObjectID *id) {
 
 //
 // Returns 0 on success, -1 on error.
+
+
 int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out) {
     char header[64];
 
@@ -117,9 +119,40 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
         return 0;
     }
 
+    char path[512];
+    object_path(id_out, path, sizeof(path));
+
+    char dir[512];
+    strncpy(dir, path, sizeof(dir));
+    dir[sizeof(dir) - 1] = '\0';
+
+    char *slash = strrchr(dir, '/');
+    if (slash) {
+        *slash = '\0';
+        mkdir(dir, 0755);
+    }
+
+    int fd = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    if (fd < 0) {
+        free(full);
+        return -1;
+    }
+
+    if (write(fd, full, total_len) != (ssize_t)total_len) {
+        close(fd);
+        free(full);
+        return -1;
+    }
+
+    fsync(fd);
+    close(fd);
+
     free(full);
-    return -1;
+    return 0;
 }
+
+
+
 // Read an object from the store.
 //
 // Steps:
