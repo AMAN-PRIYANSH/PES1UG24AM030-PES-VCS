@@ -171,7 +171,9 @@ int index_save(const Index *index) {
 
 int index_add(const char *path) {
     Index index;
-    index.count = 0;
+
+    if (index_load(&index) != 0)
+        index.count = 0;
 
     FILE *f = fopen(path, "rb");
     if (!f) return -1;
@@ -207,5 +209,8 @@ int index_add(const char *path) {
 
     index.count++;
 
-    return -1;
+    if (index_save(&index) != 0)
+        return -1;
+
+    return 0;
 }
