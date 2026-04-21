@@ -197,5 +197,15 @@ int index_add(const char *path) {
     }
 
     free(buffer);
+
+    IndexEntry *entry = &index.entries[index.count];
+
+    entry->mode = 0100644;
+    entry->hash = id;
+    strncpy(entry->path, path, sizeof(entry->path) - 1);
+    entry->path[sizeof(entry->path) - 1] = '\0';
+
+    index.count++;
+
     return -1;
 }
