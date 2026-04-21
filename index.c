@@ -189,6 +189,13 @@ int index_add(const char *path) {
     fread(buffer, 1, size, f);
     fclose(f);
 
+    ObjectID id;
+
+    if (object_write(OBJ_BLOB, buffer, size, &id) != 0) {
+        free(buffer);
+        return -1;
+    }
+
     free(buffer);
     return -1;
 }
