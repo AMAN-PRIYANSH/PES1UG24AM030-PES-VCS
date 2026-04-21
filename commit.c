@@ -210,5 +210,8 @@ int commit_create(const char *message, ObjectID *id_out) {
              "tree %s\nmessage %s\n",
              tree_hex, message);
 
+    if (object_write(OBJ_COMMIT, buffer, strlen(buffer), id_out) != 0)
+        return -1;
+
     return -1;
 }
